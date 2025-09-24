@@ -1,6 +1,3 @@
-"""
-LSTM Model definition for Human Activity Recognition
-"""
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

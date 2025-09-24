@@ -1,15 +1,11 @@
-"""
-Main script for Human Activity Recognition using LSTM
-"""
 import torch
 import argparse
-import os
 import sys
 
-from data_loader import prepare_data, get_class_names
+from data_loader import prepare_data
 from model import create_model
 from trainer import train_model
-from evaluator import evaluate_model, ModelEvaluator
+from evaluator import evaluate_model
 
 
 def get_device():
@@ -40,34 +36,29 @@ def main(args):
     
     # Prepare data
     print("\n1. Loading and preparing data...")
-    try:
-        train_loader, test_loader, data_info = prepare_data(
-            data_path=args.data_path, 
-            batch_size=args.batch_size
-        )
-        print(f"✓ Data loaded successfully!")
-        print(f"  - Training samples: {data_info['n_train_samples']}")
-        print(f"  - Test samples: {data_info['n_test_samples']}")
-        print(f"  - Features: {data_info['n_features']}")
-        print(f"  - Timesteps: {data_info['n_timesteps']}")
-        print(f"  - Classes: {data_info['n_outputs']}")
+
+    train_loader, test_loader, data_info = prepare_data(
+        data_path=args.data_path, 
+        batch_size=args.batch_size
+    )
+    print(f"✓ Data loaded successfully!")
+    print(f"  - Training samples: {data_info['n_train_samples']}")
+    print(f"  - Test samples: {data_info['n_test_samples']}")
+    print(f"  - Features: {data_info['n_features']}")
+    print(f"  - Timesteps: {data_info['n_timesteps']}")
+    print(f"  - Classes: {data_info['n_outputs']}")
         
-    except Exception as e:
-        print(f"✗ Error loading data: {e}")
-        print("Please check the data path and ensure the UCI HAR Dataset is available.")
-        return
-    
     # Create model
     print("\n2. Creating model...")
     model = create_model(
-        input_size=data_info['n_features'],
-        hidden_size=args.hidden_size,
-        num_layers=args.num_layers,
-        num_classes=data_info['n_outputs'],
-        dropout=args.dropout,
-        device=device
+        input_size = data_info['n_features'],
+        hidden_size = args.hidden_size,
+        num_layers = args.num_layers,
+        num_classes = data_info['n_outputs'],
+        dropout = args.dropout,
+        device = device
     )
-    print("✓ Model created successfully!")
+    print("Model created successfully!")
     
     # Training
     if args.mode in ['train', 'both']:
@@ -82,32 +73,18 @@ def main(args):
             verbose=True,
             save_path=args.model_path
         )
-        print("✓ Training completed!")
-        
-        # Plot training history if requested
-        if args.show_plots:
-            evaluator = ModelEvaluator(model, device)
-            evaluator.plot_training_history(history)
-    
+        print("Training completed!")
+   
     # Evaluation
     if args.mode in ['eval', 'both']:
         print("\n4. Evaluating model...")
         results = evaluate_model(
-            model=model,
-            data_loader=test_loader,
-            device=device,
-            model_path=args.model_path if args.mode == 'eval' else None,
-            show_plots=args.show_plots
+            model = model,
+            data_loader = test_loader,
+            device = device,
+            model_path = args.model_path if args.mode == 'eval' else None,
         )
-        print("✓ Evaluation completed!")
-        
-        # Save results if requested
-        if args.save_results:
-            import pickle
-            results_path = args.model_path.replace('.pth', '_results.pkl')
-            with open(results_path, 'wb') as f:
-                pickle.dump(results, f)
-            print(f"✓ Results saved to {results_path}")
+        print("Evaluation completed!")
     
     print("\n" + "=" * 60)
     print("Pipeline completed successfully!")
@@ -119,8 +96,8 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description='Human Activity Recognition using LSTM')
     
     # Data arguments
-    parser.add_argument('--data_path', type=str, default='UCIDataset/',
-                        help='Path to UCI HAR Dataset (default: UCIDataset/)')
+    parser.add_argument('--data_path', type=str, default='D:/Public Dataset/UCI HAR Dataset/',
+                        help='Path to UCI HAR Dataset')
     parser.add_argument('--batch_size', type=int, default=128,
                         help='Batch size for training and evaluation (default: 128)')
     
@@ -133,8 +110,8 @@ def parse_arguments():
                         help='Dropout probability (default: 0.5)')
     
     # Training arguments
-    parser.add_argument('--epochs', type=int, default=50,
-                        help='Number of training epochs (default: 50)')
+    parser.add_argument('--epochs', type=int, default=150,
+                        help='Number of training epochs (default: 150)')
     parser.add_argument('--learning_rate', type=float, default=0.001,
                         help='Learning rate (default: 0.001)')
     
@@ -143,12 +120,7 @@ def parse_arguments():
                         default='both', help='Mode: train, eval, or both (default: both)')
     parser.add_argument('--model_path', type=str, default='lstm_weights.pth',
                         help='Path to save/load model weights (default: lstm_weights.pth)')
-    
-    # Visualization arguments
-    parser.add_argument('--show_plots', action='store_true',
-                        help='Show training history and confusion matrix plots')
-    parser.add_argument('--save_results', action='store_true',
-                        help='Save evaluation results to file')
+
     
     return parser.parse_args()
 

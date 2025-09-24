@@ -3,11 +3,7 @@ Evaluation and visualization module for LSTM Human Activity Recognition model
 """
 import torch
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 from sklearn.metrics import classification_report, confusion_matrix
-from sklearn import metrics
-
 
 class ModelEvaluator:
     """
@@ -94,9 +90,6 @@ class ModelEvaluator:
     def print_evaluation_report(self, results):
         """
         Print evaluation results in a formatted way
-        
-        Args:
-            results (dict): Results from evaluate method
         """
         print(f"Best Validation Accuracy: {results['accuracy']:.2f}%")
         print("\nClassification Report:")
@@ -133,69 +126,9 @@ class ModelEvaluator:
             print(f"{'Weighted avg':<20} {avg['precision']:<10.4f} {avg['recall']:<10.4f} "
                   f"{avg['f1-score']:<10.4f} {avg['support']:<10}")
     
-    def plot_confusion_matrix(self, conf_matrix, save_path=None):
-        """
-        Plot confusion matrix
-        
-        Args:
-            conf_matrix: Confusion matrix array
-            save_path (str): Path to save the plot (optional)
-        """
-        plt.figure(figsize=(8, 6))
-        sns.heatmap(conf_matrix,
-                    cmap='coolwarm',
-                    linecolor='white',
-                    linewidths=1,
-                    xticklabels=self.class_names,
-                    yticklabels=self.class_names,
-                    annot=True,
-                    fmt='d')
-        plt.title('Confusion Matrix')
-        plt.ylabel('True Label')
-        plt.xlabel('Predicted Label')
-        
-        if save_path:
-            plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        
-        plt.show()
-    
-    def plot_training_history(self, history, save_path=None):
-        """
-        Plot training history
-        
-        Args:
-            history (dict): Training history from trainer
-            save_path (str): Path to save the plot (optional)
-        """
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
-        
-        # Loss plot
-        ax1.plot(history['train_loss'], label='Training Loss')
-        ax1.plot(history['val_loss'], label='Validation Loss')
-        ax1.set_title('Model Loss')
-        ax1.set_xlabel('Epoch')
-        ax1.set_ylabel('Loss')
-        ax1.legend()
-        ax1.grid(True, alpha=0.3)
-        
-        # Accuracy plot
-        ax2.plot(history['train_accuracy'], label='Training Accuracy')
-        ax2.plot(history['val_accuracy'], label='Validation Accuracy')
-        ax2.set_title('Model Accuracy')
-        ax2.set_xlabel('Epoch')
-        ax2.set_ylabel('Accuracy (%)')
-        ax2.legend()
-        ax2.grid(True, alpha=0.3)
-        
-        plt.tight_layout()
-        
-        if save_path:
-            plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        
-        plt.show()
 
 
-def evaluate_model(model, data_loader, device='cpu', model_path=None, show_plots=True):
+def evaluate_model(model, data_loader, device='cpu', model_path=None):
     """
     Convenience function to evaluate a model
     
@@ -204,7 +137,6 @@ def evaluate_model(model, data_loader, device='cpu', model_path=None, show_plots
         data_loader: DataLoader for the dataset
         device (str): Device to use for evaluation
         model_path (str): Path to saved model weights (optional)
-        show_plots (bool): Whether to show plots
         
     Returns:
         dict: Evaluation results
@@ -213,8 +145,5 @@ def evaluate_model(model, data_loader, device='cpu', model_path=None, show_plots
     results = evaluator.evaluate(data_loader, model_path)
     
     evaluator.print_evaluation_report(results)
-    
-    if show_plots:
-        evaluator.plot_confusion_matrix(results['confusion_matrix'])
     
     return results

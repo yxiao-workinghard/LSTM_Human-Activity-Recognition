@@ -10,9 +10,9 @@ This project implements a Human Activity Recognition (HAR) system using LSTM neu
 ├── model.py               # LSTM model definition
 ├── trainer.py             # Training logic and utilities
 ├── evaluator.py           # Evaluation and visualization functions
-├── config.py              # Configuration parameters
-├── requirements.txt       # Python dependencies
-└── README_LSTM.md         # This file
+├── lstm_weights.pth       # Pre-trained model weights
+├── requirements.txt       # Python dependencies (if exists)
+└── README.md              # This file
 ```
 
 ## Features

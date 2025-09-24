@@ -1,7 +1,3 @@
-"""
-Data loading and preprocessing module for Human Activity Recognition
-"""
-import numpy as np
 import torch
 from pandas import read_csv
 from numpy import dstack
@@ -9,8 +5,7 @@ from torch.utils.data import DataLoader, TensorDataset
 
 
 def load_file(filepath):
-    """Load a single file as a numpy array"""
-    dataframe = read_csv(filepath, header=None, delim_whitespace=True)
+    dataframe = read_csv(filepath, header=None, sep=r"\s+")
     return dataframe.values
 
 
